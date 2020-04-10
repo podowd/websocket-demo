@@ -1,0 +1,38 @@
+<html>
+<head><title>WebSocket Demo</title></head>
+<body>
+<button onclick="clientWebSocket.send('Client Event - ' + counter++)">Send Event to Server</button>
+<br>
+<br>
+<div class="ws_events"></div>
+
+<script>
+    var counter = 0;
+
+    var clientWebSocket = new WebSocket("ws://localhost:8080/websocket");
+
+    clientWebSocket.onopen = function () {
+        console.log("onopen", clientWebSocket);
+        clientWebSocket.send('Client Event - ' + counter++);
+    };
+
+    clientWebSocket.onmessage = function (error) {
+        console.log("onmessage", clientWebSocket, error);
+        webSocketEvents(error.data);
+    };
+
+    clientWebSocket.onerror = function (error) {
+        console.log("onerror", clientWebSocket, error);
+        webSocketEvents("WebSocket error encountered");
+    };
+
+    clientWebSocket.onclose = function (error) {
+        webSocketEvents("Closing connection");
+    };
+
+    function webSocketEvents(responseEvent) {
+        document.querySelector(".ws_events").innerHTML += responseEvent + "<br>";
+    }
+</script>
+</body>
+</html>
