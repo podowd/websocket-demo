@@ -12,20 +12,12 @@ import java.time.Duration;
 @Component
 public class DemoWebSocket implements WebSocketHandler {
 
-    private int counter = 0;
-
-    private Flux<String> eventStream = Flux.generate(sink ->
-    {
-        sink.next("Event - " + counter++);
-    });
-
     @Override
     public Mono<Void> handle(WebSocketSession webSocketSession) {
 
         return webSocketSession.send(
                 Flux.interval(Duration.ofSeconds(4))
-                    .zipWith(eventStream, (time, event) -> event)
-                    .map(webSocketSession::textMessage))
+                    .map(sequence -> webSocketSession.textMessage("Event - " + sequence.longValue())))
                 .and(webSocketSession.receive()
                     .map(WebSocketMessage::getPayloadAsText)
                     .log());
